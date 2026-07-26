@@ -9,12 +9,12 @@ namespace macgrind {
 
 // ── version ───────────────────────────────────────────────────────────────────
 
-#ifndef MVALGRIND_VERSION
-#define MVALGRIND_VERSION "0.1.0"
+#ifndef MACGRIND_VERSION
+#define MACGRIND_VERSION "0.1.0"
 #endif
 
 inline std::string version_string() {
-    return "macgrind " MVALGRIND_VERSION;
+    return "macgrind " MACGRIND_VERSION;
 }
 std::string help_string();
 

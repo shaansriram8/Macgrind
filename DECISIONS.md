@@ -45,11 +45,12 @@ Rationale: The spec explicitly permits this.  For the existence check we redirec
 `/dev/null`; for the build we let output flow to the terminal so users see progress.
 `docker run` itself uses fork/exec as required.
 
-**Docker availability is checked via `docker info > /dev/null 2>&1`.**
-Rationale: `docker info` confirms both that the binary is on PATH and that the daemon is
-running.  A "binary exists but daemon is down" situation is common on Macs when Docker
-Desktop hasn't been launched; `docker image inspect` would succeed but `docker run` would
-fail later with a cryptic error.
+**Docker availability is checked via `docker ps -q > /dev/null 2>&1`.**
+Rationale: Confirms both that the binary is on PATH and that the daemon is running — a
+"binary exists but daemon is down" situation is common on Macs when Docker Desktop hasn't
+been launched; `docker image inspect` would succeed but `docker run` would fail later with
+a cryptic error. `docker ps` was chosen over `docker info` because it's an order of
+magnitude faster (~20ms vs. ~500ms) and this check runs on every invocation.
 
 ---
 
@@ -75,11 +76,13 @@ must pass an ELF binary instead.
 
 ## No Homebrew bottles in v0.1.0
 
-**The formula downloads a pre-built binary tarball via `on_arm` / `on_intel` blocks rather than using Homebrew's bottle infrastructure.**
+**The formula downloads a single pre-built arm64 binary tarball rather than using
+Homebrew's bottle infrastructure.**
 Rationale: Bottle infrastructure requires a bottle server (typically GitHub Packages via
 `brew bottle`).  Pre-built tarballs attached to GitHub Releases are simpler for a
 personal tap and still give users a fast, no-compile install.  Bottles can be added later
-once the tap is established.
+once the tap is established.  The formula is arm64-only (no `on_arm`/`on_intel` split);
+see the "Apple Silicon only" limitation in the README.
 
 ---
 
