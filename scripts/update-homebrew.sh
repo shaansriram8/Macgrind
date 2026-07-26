@@ -1,19 +1,18 @@
 #!/usr/bin/env bash
 # Bump the Homebrew formula to a new version.
-# Usage: update-homebrew.sh <version> <arm64-sha256> <x86_64-sha256>
+# Usage: update-homebrew.sh <version> <arm64-sha256>
 #
 # Example (called from release.yml after artifacts are built):
-#   ./scripts/update-homebrew.sh 0.2.0 abc123... def456...
+#   ./scripts/update-homebrew.sh 0.2.0 abc123...
 set -euo pipefail
 
-if [[ $# -ne 3 ]]; then
-    echo "Usage: $0 <version> <arm64-sha256> <x86_64-sha256>" >&2
+if [[ $# -ne 2 ]]; then
+    echo "Usage: $0 <version> <arm64-sha256>" >&2
     exit 1
 fi
 
 VERSION="$1"
 ARM64_SHA="$2"
-X86_SHA="$3"
 
 FORMULA="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/homebrew/macgrind.rb"
 
@@ -25,37 +24,13 @@ fi
 # Bump version line
 sed -i.bak "s/version \"[^\"]*\"/version \"${VERSION}\"/" "$FORMULA"
 
-# Bump URLs (arm64 and x86_64)
+# Bump the release URL (arm64 only — see fix/arm64-only-release).
 sed -i.bak \
     "s|releases/download/v[^/]*/macgrind-[^-]*-arm64|releases/download/v${VERSION}/macgrind-${VERSION}-arm64|g" \
     "$FORMULA"
-sed -i.bak \
-    "s|releases/download/v[^/]*/macgrind-[^-]*-x86_64|releases/download/v${VERSION}/macgrind-${VERSION}-x86_64|g" \
-    "$FORMULA"
 
-# Bump SHA256 placeholders / previous values.
-# The file has exactly two sha256 lines inside on_arm / on_intel blocks.
-python3 - "$FORMULA" "$ARM64_SHA" "$X86_SHA" <<'PY'
-import sys, re
-
-path, arm64, x86 = sys.argv[1], sys.argv[2], sys.argv[3]
-content = open(path).read()
-
-# Replace the sha256 inside the on_arm block
-content = re.sub(
-    r'(on_arm\b.*?sha256 ")[^"]*(")',
-    lambda m: m.group(1) + arm64 + m.group(2),
-    content, count=1, flags=re.DOTALL,
-)
-# Replace the sha256 inside the on_intel block
-content = re.sub(
-    r'(on_intel\b.*?sha256 ")[^"]*(")',
-    lambda m: m.group(1) + x86 + m.group(2),
-    content, count=1, flags=re.DOTALL,
-)
-open(path, "w").write(content)
-print(f"Updated {path}: arm64={arm64[:12]}... x86_64={x86[:12]}...")
-PY
+# Bump the sha256 line. The formula has exactly one.
+sed -i.bak "s/sha256 \"[^\"]*\"/sha256 \"${ARM64_SHA}\"/" "$FORMULA"
 
 rm -f "${FORMULA}.bak"
-echo "Formula updated to v${VERSION}."
+echo "Formula updated to v${VERSION}: sha256=${ARM64_SHA:0:12}..."

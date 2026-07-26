@@ -10,7 +10,7 @@ fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
-MACGRIND="${MVALGRIND:-$REPO_ROOT/build/macgrind}"
+MACGRIND="${MACGRIND:-$REPO_ROOT/build/macgrind}"
 FIXTURES="$SCRIPT_DIR/fixtures"
 EXPECTED="$SCRIPT_DIR/expected"
 

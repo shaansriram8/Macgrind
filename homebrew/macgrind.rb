@@ -1,11 +1,11 @@
-class Mvalgrind < Formula
+class Macgrind < Formula
   desc "Valgrind for macOS — runs Valgrind in a local Docker container"
   homepage "https://github.com/shaansriram8/macgrind"
   license "MIT"
   version "0.1.0"
 
   url "https://github.com/shaansriram8/macgrind/releases/download/v0.1.0/macgrind-0.1.0-arm64-apple-darwin.tar.gz"
-  sha256 "143fbdc2d532774538a8aad04701a5d943bd6710554c6ada7c4d48cbfc7acf11"
+  sha256 "f9cd4cd26c0d49e28d089e54de39af8e18aac55a9107aa9e791e2508cb769976"
 
   # 'docker' installs the Docker CLI.  Docker Desktop (a cask) provides the
   # container runtime — see the caveats block below.
